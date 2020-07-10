@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+
+  <h1>Maze Creator</h1>
+
+
+  <script>
+    class MapSite {
+      constructor() {
+        if (this.constructor === MapSite) {
+          throw 'this is an Abstrct Class';
+        }
+      }
+
+      enter() {
+        throw 'this method need to be implemented on each subClass';
+      }
+    }
+
+    class Room extends MapSite {
+      constructor() {
+        super();
+        this.name = `room${Room.prototype.conteo}`;
+        this.roomNumber = Room.prototype.conteo;
+        this.structure = {};
+        console.log(`creating room number ${this.roomNumber}`);
+        Room.prototype.conteo++;
+      }
+
+      enter() {
+        console.log(`your are now on room number ${this.roomNumber}`);
+      }
+
+      setSide(direction, MapSiteComponent) {
+        if (
+          !(
+            direction === 'N' ||
+            direction === 'S' ||
+            direction === 'E' ||
+            direction === 'W'
+          )
+        ) {
+          throw 'you have to set a real direction N, S, E, or W';
+        } else {
+          this.structure[direction] = MapSiteComponent;
+        }
+      }
+
+      getSide(direction) {
+        if (
+          !(
+            direction === 'N' ||
+            direction === 'S' ||
+            direction === 'E' ||
+            direction === 'W'
+          )
+        ) {
+          throw 'you have to set a real direction N, S, E, or W';
+        } else if (this[direction]) {
+          console.log(this[direction].name);
+        } else {
+          console.log('nothing There');
+        }
+      }
+    }
+
+    Room.prototype.conteo = 1;
+
+    class Wall extends MapSite {
+      constructor() {
+        super();
+        this.name = `Wall${Wall.prototype.conteo}`;
+        this.wallNumber = Wall.prototype.conteo;
+        console.log(`creating wall number ${this.wallNumber}`);
+        Wall.prototype.conteo++;
+      }
+    }
+    Wall.prototype.conteo = 1;
+
+    class Door extends MapSite {
+      constructor(roomA, roomB) {
+        super();
+        if (!(roomA && roomB)) {
+          throw 'need two rooms';
+        }
+
+        this.name = `Door${Door.prototype.conteo}`;
+        this.doorNumber = Door.prototype.conteo;
+        this.between = [roomA.name, roomB.name];
+        console.log(
+          `creating door # ${this.doorNumber} between ${this.between[0]} and ${this.between[1]} `
+        );
+        Door.prototype.conteo++;
+      }
+    }
+    Door.prototype.conteo = 1;
+
+    class Maze {
+      constructor() {
+        console.log(`creating a new Maze`);
+        this.rooms = [];
+      }
+
+      addRoom(room) {
+        this.rooms.push(room);
+      }
+
+      /* TODO: create search RoomNo. method */
+    }
+
+    class MazeGame {
+      constructor() {
+        console.log(`creating a new MazeGame`);
+        const firstMaze = new Maze();
+        const r1 = new Room();
+        const r2 = new Room();
+        const theDoor = new Door(r1, r2);
+        firstMaze.addRoom(r1);
+        firstMaze.addRoom(r2);
+
+        r1.setSide('N', new Wall());
+        r1.setSide('E', theDoor);
+        r1.setSide('S', new Wall());
+        r1.setSide('W', new Wall());
+
+        r2.setSide('N', new Wall());
+        r2.setSide('E', new Wall());
+        r2.setSide('S', new Wall());
+        r2.setSide('W', theDoor);
+        return firstMaze;
+      }
+    }
+
+    myMaze = new MazeGame();
+  </script>
+</body>
+
+</html>
