@@ -71,6 +71,14 @@
 
     Room.prototype.conteo = 1;
 
+    class EnchantedRoom extends Room {
+      constructor() {
+        super();
+        this.name = `enchanted room${this.roomNumber}`;
+        console.log(`creating EnchantedRoom number ${this.roomNumber}`);
+      }
+    }
+
     class Wall extends MapSite {
       constructor() {
         super();
@@ -100,6 +108,20 @@
     }
     Door.prototype.conteo = 1;
 
+    class DoorNeedingSpell extends Door {
+      constructor(roomA, roomB) {
+        super(roomA, roomB);
+        this.name = `enchanted door${this.doorNumber}`;
+        console.log(`creating EnchantedDoor number ${this.doorNumber}`);
+        this.protectedBySpell = true;
+      }
+
+      unlock(spell) {
+        this.protectedBySpell = spell !== 'kadabra';
+        console.log('you tried to unlock the door...');
+      }
+    }
+
     class Maze {
       constructor() {
         console.log(`creating a new Maze`);
@@ -113,30 +135,60 @@
       /* TODO: create search RoomNo. method */
     }
 
-    class MazeGame {
-      constructor() {
-        console.log(`creating a new MazeGame`);
-        const firstMaze = new Maze();
-        const r1 = new Room();
-        const r2 = new Room();
-        const theDoor = new Door(r1, r2);
-        firstMaze.addRoom(r1);
-        firstMaze.addRoom(r2);
+    class MazeFactory {
+      makeMaze() {
+        return new Maze();
+      }
 
-        r1.setSide('N', new Wall());
-        r1.setSide('E', theDoor);
-        r1.setSide('S', new Wall());
-        r1.setSide('W', new Wall());
+      makeWall() {
+        return new Wall();
+      }
 
-        r2.setSide('N', new Wall());
-        r2.setSide('E', new Wall());
-        r2.setSide('S', new Wall());
-        r2.setSide('W', theDoor);
-        return firstMaze;
+      makeRoom() {
+        return new Room();
+      }
+
+      makeDoor(room1, room2) {
+        return new Door(room1, room2);
       }
     }
 
-    myMaze = new MazeGame();
+    class EnchantedMazeFactory extends MazeFactory {
+      makeRoom() {
+        return new EnchantedRoom();
+      }
+
+      makeDoor(room1, room2) {
+        return new DoorNeedingSpell(room1, room2);
+      }
+    }
+
+    class MazeGame {
+      constructor(mazeFactory) {
+        console.log(`creating a new MazeGame`);
+        const myMaze = mazeFactory.makeMaze();
+        const r1 = mazeFactory.makeRoom();
+        const r2 = mazeFactory.makeRoom();
+        const theDoor = mazeFactory.makeDoor(r1, r2);
+
+        myMaze.addRoom(r1);
+        myMaze.addRoom(r2);
+
+        r1.setSide('N', mazeFactory.makeWall());
+        r1.setSide('E', theDoor);
+        r1.setSide('S', mazeFactory.makeWall());
+        r1.setSide('W', mazeFactory.makeWall());
+
+        r2.setSide('N', mazeFactory.makeWall());
+        r2.setSide('E', mazeFactory.makeWall());
+        r2.setSide('S', mazeFactory.makeWall());
+        r2.setSide('W', theDoor);
+        return myMaze;
+      }
+    }
+
+    myMaze = new MazeGame(new MazeFactory());
+    myEnchantedMaze = new MazeGame(new EnchantedMazeFactory());
   </script>
 </body>
 
