@@ -113,6 +113,67 @@
       /* TODO: create search RoomNo. method */
     }
 
+    class MazeBuilder {
+      constructor() {
+        if (this.constructor === MapSite) {
+          throw 'this is an Abstrct Class';
+        }
+      }
+
+      buildMaze() {
+        throw 'this method need to be implemented on each subClass';
+      }
+
+      buildRoom() {
+        throw 'this method need to be implemented on each subClass';
+      }
+
+      buildDoor() {
+        throw 'this method need to be implemented on each subClass';
+      }
+
+      getMaze() {
+        throw 'this method need to be implemented on each subClass';
+      }
+    }
+
+    class StandardMazeBuilder extends MazeBuilder {
+      constructor() {
+        super();
+        let currentMaze = false;
+        this.getMaze = () => currentMaze;
+        this.setMaze = maze => {
+          currentMaze = maze;
+        };
+      }
+
+      buildMaze() {
+        this.setMaze(new Maze());
+      }
+
+      buildRoom() {
+        if (this.getMaze) {
+          const room = new Room();
+          const directions = ['N', 'S', 'E', 'W'];
+          directions.forEach(direction => room.setSide(direction, new Wall()));
+          this.getMaze().addRoom(room);
+        }
+      }
+
+      buildDoor() {
+        const r1 = this.getMaze()[0];
+        const r2 = this.getMaze()[1];
+        const door = new Door(r1, r2);
+
+        r1.setSide(this.commonWall(r1), door);
+        r2.setSide(this.commonWall(r2), door);
+      }
+
+      commonWall(room) {
+        return room === this.getMaze()[0] ? 'E' : 'W';
+      }
+    }
+
     class MazeGame {
       constructor() {
         console.log(`creating a new MazeGame`);
