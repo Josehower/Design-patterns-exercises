@@ -71,16 +71,35 @@
 
     Room.prototype.conteo = 1;
 
+    class RoomWithBomb extends Room {
+      constructor() {
+        super();
+        this.name = `Bombed room${this.roomNumber}`;
+        this.inside = 'bomb';
+      }
+    }
+
     class Wall extends MapSite {
       constructor() {
         super();
-        this.name = `Wall${Wall.prototype.conteo}`;
+        this.name = `Wall${Wall.prototype.conteo} `;
         this.wallNumber = Wall.prototype.conteo;
-        console.log(`creating wall number ${this.wallNumber}`);
+        console.log(`creating wall number ${this.wallNumber} `);
         Wall.prototype.conteo++;
       }
     }
     Wall.prototype.conteo = 1;
+
+    class BombedWall extends Wall {
+      constructor() {
+        super();
+        this.name = `Bombed wall${this.wallNumber} `;
+      }
+
+      explodeBomb() {
+        console.log('kahboom...');
+      }
+    }
 
     class Door extends MapSite {
       constructor(roomA, roomB) {
@@ -89,7 +108,7 @@
           throw 'need two rooms';
         }
 
-        this.name = `Door${Door.prototype.conteo}`;
+        this.name = `Door${Door.prototype.conteo} `;
         this.doorNumber = Door.prototype.conteo;
         this.between = [roomA.name, roomB.name];
         console.log(
@@ -118,28 +137,62 @@
         console.log(`creating a new MazeGame`);
       }
 
+      makeMaze() {
+        return new Maze();
+      }
+
+      makeRoom() {
+        return new Room();
+      }
+
+      makeWall() {
+        return new Wall();
+      }
+
+      makeDoor(r1, r2) {
+        return new Door(r1, r2);
+      }
+
       createMaze() {
-        const firstMaze = new Maze();
-        const r1 = new Room();
-        const r2 = new Room();
-        const theDoor = new Door(r1, r2);
-        firstMaze.addRoom(r1);
-        firstMaze.addRoom(r2);
+        const oneMaze = this.makeMaze();
+        const r1 = this.makeRoom();
+        const r2 = this.makeRoom();
+        const theDoor = this.makeDoor(r1, r2);
+        oneMaze.addRoom(r1);
+        oneMaze.addRoom(r2);
 
-        r1.setSide('N', new Wall());
+        r1.setSide('N', this.makeWall());
         r1.setSide('E', theDoor);
-        r1.setSide('S', new Wall());
-        r1.setSide('W', new Wall());
+        r1.setSide('S', this.makeWall());
+        r1.setSide('W', this.makeWall());
 
-        r2.setSide('N', new Wall());
-        r2.setSide('E', new Wall());
-        r2.setSide('S', new Wall());
+        r2.setSide('N', this.makeWall());
+        r2.setSide('E', this.makeWall());
+        r2.setSide('S', this.makeWall());
         r2.setSide('W', theDoor);
-        return firstMaze;
+        return oneMaze;
+      }
+    }
+
+    class BombedMazeGame extends MazeGame {
+      constructor() {
+        super();
+        console.log(`creating a new Bombed Maze Game`);
+      }
+
+      makeWall() {
+        return new BombedWall();
+      }
+
+      makeRoom() {
+        return new RoomWithBomb();
       }
     }
 
     myMaze = new MazeGame().createMaze();
+    console.log(myMaze);
+    myBombedMaze = new BombedMazeGame().createMaze();
+    console.log(myBombedMaze);
   </script>
 </body>
 
