@@ -161,8 +161,8 @@
       }
 
       buildDoor() {
-        const r1 = this.getMaze()[0];
-        const r2 = this.getMaze()[1];
+        const r1 = this.getMaze().rooms[0];
+        const r2 = this.getMaze().rooms[1];
         const door = new Door(r1, r2);
 
         r1.setSide(this.commonWall(r1), door);
@@ -170,34 +170,28 @@
       }
 
       commonWall(room) {
-        return room === this.getMaze()[0] ? 'E' : 'W';
+        return room === this.getMaze().rooms[0] ? 'E' : 'W';
       }
     }
 
     class MazeGame {
       constructor() {
-        console.log(`creating a new MazeGame`);
-        const firstMaze = new Maze();
-        const r1 = new Room();
-        const r2 = new Room();
-        const theDoor = new Door(r1, r2);
-        firstMaze.addRoom(r1);
-        firstMaze.addRoom(r2);
+        console.log('maze Game created');
+      }
 
-        r1.setSide('N', new Wall());
-        r1.setSide('E', theDoor);
-        r1.setSide('S', new Wall());
-        r1.setSide('W', new Wall());
+      createMaze(mazeBuilder) {
+        const myMaze = mazeBuilder.buildMaze();
+        const r1 = mazeBuilder.buildRoom();
+        const r2 = mazeBuilder.buildRoom();
+        const theDoor = mazeBuilder.buildDoor();
 
-        r2.setSide('N', new Wall());
-        r2.setSide('E', new Wall());
-        r2.setSide('S', new Wall());
-        r2.setSide('W', theDoor);
-        return firstMaze;
+        return mazeBuilder.getMaze();
       }
     }
 
-    myMaze = new MazeGame();
+    myMazeGame = new MazeGame();
+    const myMaze = myMazeGame.createMaze(new StandardMazeBuilder());
+    console.log(myMaze);
   </script>
 </body>
 
