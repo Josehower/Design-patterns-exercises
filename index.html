@@ -116,6 +116,9 @@
     class MazeGame {
       constructor() {
         console.log(`creating a new MazeGame`);
+      }
+
+      createMaze() {
         const firstMaze = new Maze();
         const r1 = new Room();
         const r2 = new Room();
@@ -136,7 +139,7 @@
       }
     }
 
-    myMaze = new MazeGame();
+    myMaze = new MazeGame().createMaze();
   </script>
 </body>
 
