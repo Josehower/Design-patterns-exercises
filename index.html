@@ -174,6 +174,29 @@
       }
     }
 
+    class CountingMazeBuilder extends MazeBuilder {
+      constructor() {
+        super();
+        this.maze;
+      }
+
+      buildMaze() {
+        this.maze = { rooms: 0, doors: 0 };
+      }
+
+      buildRoom() {
+        this.maze.rooms++;
+      }
+
+      buildDoor() {
+        this.maze.doors++;
+      }
+
+      getMaze() {
+        return `this maze has ${this.maze.rooms} rooms and ${this.maze.doors} doors `;
+      }
+    }
+
     class MazeGame {
       constructor() {
         console.log('maze Game created');
@@ -190,8 +213,10 @@
     }
 
     myMazeGame = new MazeGame();
-    const myMaze = myMazeGame.createMaze(new StandardMazeBuilder());
+    const myMaze = myMazeGame.createMaze(new CountingMazeBuilder());
+    const myMaze2 = myMazeGame.createMaze(new StandardMazeBuilder());
     console.log(myMaze);
+    console.log(myMaze2);
   </script>
 </body>
 
