@@ -10,6 +10,7 @@
 
 
   <script>
+    /* eslint-disable class-methods-use-this */
     class MapSite {
       constructor() {
         if (this.constructor === MapSite) {
@@ -29,7 +30,12 @@
         this.roomNumber = Room.prototype.conteo;
         this.structure = {};
         console.log(`creating room number ${this.roomNumber}`);
-        Room.prototype.conteo++;
+        Room.prototype.conteo += 1;
+      }
+
+      clone() {
+        const roomClone = new Room();
+        return roomClone;
       }
 
       enter() {
@@ -77,6 +83,11 @@
         this.name = `enchanted room${this.roomNumber}`;
         console.log(`creating EnchantedRoom number ${this.roomNumber}`);
       }
+
+      clone() {
+        const roomClone = new EnchantedRoom();
+        return roomClone;
+      }
     }
 
     class Wall extends MapSite {
@@ -85,7 +96,12 @@
         this.name = `Wall${Wall.prototype.conteo}`;
         this.wallNumber = Wall.prototype.conteo;
         console.log(`creating wall number ${this.wallNumber}`);
-        Wall.prototype.conteo++;
+        Wall.prototype.conteo = +1;
+      }
+
+      clone() {
+        const wallClone = new Wall();
+        return wallClone;
       }
     }
     Wall.prototype.conteo = 1;
@@ -103,7 +119,12 @@
         console.log(
           `creating door # ${this.doorNumber} between ${this.between[0]} and ${this.between[1]} `
         );
-        Door.prototype.conteo++;
+        Door.prototype.conteo += 1;
+      }
+
+      clone(roomA, roomB) {
+        const doorClone = new Door(roomA, roomB);
+        return doorClone;
       }
     }
     Door.prototype.conteo = 1;
@@ -114,6 +135,11 @@
         this.name = `enchanted door${this.doorNumber}`;
         console.log(`creating EnchantedDoor number ${this.doorNumber}`);
         this.protectedBySpell = true;
+      }
+
+      clone(roomA, roomB) {
+        const doorClone = new DoorNeedingSpell(roomA, roomB);
+        return doorClone;
       }
 
       unlock(spell) {
@@ -128,6 +154,11 @@
         this.rooms = [];
       }
 
+      clone(roomA, roomB) {
+        const mazeClone = new Maze(roomA, roomB);
+        return mazeClone;
+      }
+
       addRoom(room) {
         this.rooms.push(room);
       }
@@ -135,37 +166,45 @@
       /* TODO: create search RoomNo. method */
     }
 
-    class MazeFactory {
+    class MazePrototypeFactory {
+      constructor(maze, wall, room, door) {
+        this.protoMaze = maze;
+        this.protoRoom = room;
+        this.protoWall = wall;
+        this.protoDoor = door;
+      }
+
       makeMaze() {
-        return new Maze();
+        return this.protoMaze.clone();
       }
 
       makeWall() {
-        return new Wall();
+        return this.protoWall.clone();
       }
 
       makeRoom() {
-        return new Room();
+        return this.protoRoom.clone();
       }
 
       makeDoor(room1, room2) {
-        return new Door(room1, room2);
+        return this.protoDoor.clone(room1, room2);
       }
     }
 
-    class EnchantedMazeFactory extends MazeFactory {
-      makeRoom() {
-        return new EnchantedRoom();
-      }
-
-      makeDoor(room1, room2) {
-        return new DoorNeedingSpell(room1, room2);
+    class EnchantedMazeFactory extends MazePrototypeFactory {
+      constructor(maze, wall, room, door) {
+        super(maze, wall, room, door);
+        this.protoRoom = new EnchantedRoom();
+        this.protoDoom = new DoorNeedingSpell(this.protoRoom, this.protoRoom);
       }
     }
 
     class MazeGame {
-      constructor(mazeFactory) {
+      constructor() {
         console.log(`creating a new MazeGame`);
+      }
+
+      createMaze(mazeFactory) {
         const myMaze = mazeFactory.makeMaze();
         const r1 = mazeFactory.makeRoom();
         const r2 = mazeFactory.makeRoom();
@@ -187,9 +226,25 @@
       }
     }
 
-    myMaze = new MazeGame(new MazeFactory());
-    myEnchantedMaze = new MazeGame(new EnchantedMazeFactory());
-    console.log(myEnchantedMaze);
+    class InitGame {
+      constructor(param = 'N') {
+        const myMazeGame = new MazeGame();
+        const maze = new Maze();
+        const wall = new Wall();
+        const room = new Room();
+        const door = new Door(room, room);
+        const factory =
+          param === 'N'
+            ? new MazePrototypeFactory(maze, wall, room, door)
+            : new EnchantedMazeFactory(maze, wall, room, door);
+        return myMazeGame.createMaze(factory);
+      }
+    }
+
+    const myInit = new InitGame();
+    const myEnchantedInit = new InitGame('E');
+    console.log(myInit);
+    console.log(myEnchantedInit);
   </script>
 </body>
 
