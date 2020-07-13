@@ -174,6 +174,22 @@
         this.protoDoor = door;
       }
 
+      static actualInstance = null;
+
+      static instantiate(maze, wall, room, door) {
+        if (MazePrototypeFactory.actualInstance === null) {
+          MazePrototypeFactory.actualInstance = new MazePrototypeFactory(
+            maze,
+            wall,
+            room,
+            door
+          );
+        } else {
+          throw 'one instance of this maze is already running';
+        }
+        return MazePrototypeFactory.actualInstance;
+      }
+
       makeMaze() {
         return this.protoMaze.clone();
       }
@@ -196,6 +212,22 @@
         super(maze, wall, room, door);
         this.protoRoom = new EnchantedRoom();
         this.protoDoom = new DoorNeedingSpell(this.protoRoom, this.protoRoom);
+      }
+
+      static actualInstance = null;
+
+      static instantiate(maze, wall, room, door) {
+        if (EnchantedMazeFactory.actualInstance === null) {
+          EnchantedMazeFactory.actualInstance = new EnchantedMazeFactory(
+            maze,
+            wall,
+            room,
+            door
+          );
+        } else {
+          throw 'one instance of this enchanted maze is already running';
+        }
+        return EnchantedMazeFactory.actualInstance;
       }
     }
 
@@ -235,8 +267,8 @@
         const door = new Door(room, room);
         const factory =
           param === 'N'
-            ? new MazePrototypeFactory(maze, wall, room, door)
-            : new EnchantedMazeFactory(maze, wall, room, door);
+            ? MazePrototypeFactory.instantiate(maze, wall, room, door)
+            : EnchantedMazeFactory.instantiate(maze, wall, room, door);
         return myMazeGame.createMaze(factory);
       }
     }
